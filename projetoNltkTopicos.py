@@ -26,7 +26,7 @@ for k in range(len(lista)-1):
   uniao=set(lista[k]+lista[k+1])
   uniao=list(uniao)
   print(uniao)
-  print() # aqui vai ter uma sentenca unica que na vdd é a uniao de duas sentencas, que nem "a dog and a cat + a cat and a frog = a dog and a cat frog"
+  print() # aqui vai ter uma sentenca unica que na vdd é a uniao de duas sentencas, que nem "a dog and a cat + a cat and a frog = a dog and cat frog"
   print(lista[k])
   print(lista[k+1])
 
@@ -77,6 +77,6 @@ print(listares)
 
 #falta:
 #botar os numeros ate 2 casas decimais
-#resolver os resultados que dao 0, pois tem sentencas que nao tem NENHUMA palavra igual, entao a parte de cima da formula fica com 0, entao o resultado da 0 tb, parecendo que n tem semelhanca mesmo quando tem
+#resolver os resultados que dao 0, pois tem sentencas que nao tem NENHUMA palavra igual, entao a parte de cima da formula fica com 0, entao o resultado da 0 tb, parecendo que n tem semelhanca mesmo quando tem (na vdd acho que ate separa as sentencas do jeito que a paula deu no enunciado do projeto, mas n sei se ta certo ou é bug)
 
 #ps: a formula ta em um dos arq do colab q a prof botou no sigaa, n sei qual arq é
