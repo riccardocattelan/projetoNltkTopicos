@@ -126,6 +126,12 @@ sp=spacysentencas(cosseno)
 print()
 print('Todos os resultados que foram gerados por meio da formula das somatorias (a primeira é similaridadde da s1 com s2, dps é da s2 com s3, etc...): ', cosseno, sp)
 
+# pip install -U pip setuptools wheel
+# pip install -U spacy
+# !python -m spacy download pt_core_news_lg
+# from spacy import displacy
+
+
 #falta:
 #botar os numeros ate 2 casas decimais
 #resolver os resultados que dao 0, pois tem sentencas que nao tem nenhuma palavra igual, entao a parte de cima da formula fica com 0, entao o resultado da 0 tb, parecendo que n tem semelhanca mesmo quando tem (na vdd acho que ate separa as sentencas do jeito que a paula deu no enunciado do projeto, mas n sei se ta certo ou é bug)
