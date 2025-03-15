@@ -1,4 +1,4 @@
-#O MENOS PIOR ATE AGORA E UM POUCO MAIS COMPLETO
+# BACKUP
 
 ##################################################################################################
 
@@ -9,161 +9,153 @@ from nltk.tokenize import sent_tokenize
 from nltk.probability import FreqDist
 from nltk.corpus import stopwords
 from math import sqrt
-
 import spacy
 nlp=spacy.load("pt_core_news_lg")
 
-# nlp=spacy.load("pt_core_news_sm")
-# doc=nlp("Apple está tentando comprar uma startup do Reino Unido por R$1 bilhão.")
-# for tokeniza in doc.ents:
-#   print(tokeniza, "|", tokeniza.label_)
 
 #criar uma lista com dentro as sentencas
 def listaTokenizada(texto):
   stop_words = set(stopwords.words('portuguese'))
-  lista=[]
-  # listares=[]
+  listaComSentencasSeparadas=[]
   textoMinusculas=texto.lower()
   sentencas=nltk.tokenize.sent_tokenize(textoMinusculas)
-  for i in sentencas:
-    palavras=word_tokenize(i)
-    listas=[]
-    for j in palavras:
-      if j not in stop_words and j.isalpha():
-        listas.append(j)
-    lista.append(listas)
-  print('Essa é a lista com todas as sentencas dentro separadas em uma lista interna cada uma:', lista)  #agora tem uma lista maior com varias listas dentro, cada uma das mini listas tem uma sentenca (em teoria)
-  return lista
+  for sentencaUnica in sentencas:
+    palavras=word_tokenize(sentencaUnica)
+    miniListas=[]
+    for palavraUnica in palavras:
+      if palavraUnica not in stop_words and palavraUnica.isalpha():
+        miniListas.append(palavraUnica)
+    listaComSentencasSeparadas.append(miniListas)
+  # print('Essa é a lista com todas as sentencas dentro separadas em uma lista interna cada uma:', listaComSentencasSeparadas)  #agora tem uma lista maior com varias listas dentro, cada uma das mini listas tem uma sentenca (em teoria)
+  return listaComSentencasSeparadas
 
 #unir sentenças
-def formulaCosseno(lista):
-  listares=[]
-  for k in range(len(lista)-1):
-    uniao=set(lista[k]+lista[k+1])
-    uniao=list(uniao)
-    print()
-    print('Essa é a uniao de 2 sentencas, sem repeticao, para ser usada na comparacao e na formula: ', uniao) # aqui vai ter uma sentenca unica que na vdd é a uniao de duas sentencas, que nem "a dog and a cat + a cat and a frog = a dog and cat frog"
-    print('Primeira sentenca a ser comparada:', lista[k])
-    print('Segunda sentenca a ser comparada: ', lista[k+1])
+def formulaCosseno(listaComSentencasSeparadas):
+  listaDasSimilaridades=[]
+  for k in range(len(listaComSentencasSeparadas)-1):
+    uniaoDuasSentencas=set(listaComSentencasSeparadas[k]+listaComSentencasSeparadas[k+1])
+    uniaoDuasSentencas=list(uniaoDuasSentencas)
+    # print()
+    # print('Essa é a uniao de 2 sentencas, sem repeticao, para ser usada na comparacao e na formula: ', uniaoDuasSentencas) # aqui vai ter uma sentenca unica que na vdd é a uniao de duas sentencas, que nem "a dog and a cat + a cat and a frog = a dog and cat frog"
+    # print('Primeira sentenca a ser comparada:', listaComSentencasSeparadas[k])
+    # print('Segunda sentenca a ser comparada: ', listaComSentencasSeparadas[k+1])
 
     #criar os numeros de vezes que aparece uma palavra da uniao nas sentencas em comparacao
-    sent1=[]
-    sent2=[]
-    for i in range(len(uniao)):
+    aparecimentoPalavrasSentenca1=[]
+    aparecimentoPalavrasSentenca2=[]
+    for i in range(len(uniaoDuasSentencas)):
       cont=0
-      for j in range(len(lista[k])):
-        if uniao[i]==lista[k][j]:
+      for j in range(len(listaComSentencasSeparadas[k])):
+        if uniaoDuasSentencas[i]==listaComSentencasSeparadas[k][j]:
           cont+=1
-      sent1.append(cont)
+      aparecimentoPalavrasSentenca1.append(cont)
 
-    for i in range(len(uniao)):
+    for i in range(len(uniaoDuasSentencas)):
       cont=0
-      for j in range(len(lista[k+1])):
-        if uniao[i]==lista[k+1][j]:
+      for j in range(len(listaComSentencasSeparadas[k+1])):
+        if uniaoDuasSentencas[i]==listaComSentencasSeparadas[k+1][j]:
           cont+=1
-      sent2.append(cont)
-    print('Quantidade de vezes que aparace cada palavra na primeira sentenca, com base a uniao das sentencas: ', sent1)
-    print('Quantidade de vezes que aparace cada palavra na segunda sentenca, com base a uniao das sentencas: ', sent2)
+      aparecimentoPalavrasSentenca2.append(cont)
+    # print('Quantidade de vezes que aparace cada palavra na primeira sentenca, com base a uniao das sentencas: ', aparecimentoPalavrasSentenca1)
+    # print('Quantidade de vezes que aparace cada palavra na segunda sentenca, com base a uniao das sentencas: ', aparecimentoPalavrasSentenca2)
 
   #comeca a implementacao da formula com somatoria para fazer a comparacao
   #parte de cima da formula da somatoria
-    somatorioup=0
-    for i in range(len(uniao)):
-      mult=sent1[i]*sent2[i]
-      somatorioup+=mult
-    print('Parte de cima da formula da similaridade: ', somatorioup)
+    somatorioCossenoParteSuperior=0
+    for i in range(len(uniaoDuasSentencas)):
+      multiplicacao=aparecimentoPalavrasSentenca1[i]*aparecimentoPalavrasSentenca2[i]
+      somatorioCossenoParteSuperior+=multiplicacao
+    # print('Parte de cima da formula da similaridade: ', somatorioCossenoParteSuperior)
 
     #parte de baixo da formula da somatoria
-    soma1=0
-    soma2=0
-    for i in range(len(sent1)):
-      soma1+=sent1[i]**2
-      soma2+=sent2[i]**2
-    somatoriodown=sqrt((soma1*soma2))
-    print('Parte de baixo da formula da similaridade: ', somatoriodown)
+    variavelA=0
+    variavelB=0
+    for i in range(len(aparecimentoPalavrasSentenca1)):
+      variavelA+=aparecimentoPalavrasSentenca1[i]**2
+      variavelB+=aparecimentoPalavrasSentenca2[i]**2
+    somatorioCossenoParteInferior=sqrt((variavelA*variavelB))
+    # print('Parte de baixo da formula da similaridade: ', somatorioCossenoParteInferior)
 
     #calculando somatoria final
-    resultadocomparacao=somatorioup/somatoriodown
-    print('Esse é o resultado da formula entre as 2 sentencas acima:', resultadocomparacao)
+    resultadocomparacao=somatorioCossenoParteSuperior/somatorioCossenoParteInferior
+    # print('Esse é o resultado da formula entre as 2 sentencas acima:', resultadocomparacao)
     #criando uma lista com o resultado de todas as somatorias finais, tipo comparacao sent0 com sent1, sent1 com sent2, sent2 com sent3, etc...
-    listares.append(resultadocomparacao)
-  return listares
+    listaDasSimilaridades.append(resultadocomparacao)
+  return listaDasSimilaridades
 
-def mediaSentencas(listares):
+def mediaSentencas(listaDasSimilaridades):
   #achar a media entre as similaridades
   somaDasSimilaridades=0
   quantidadeDeSimilaridades=0
-  for similaridadeEntreSentencas in listares:
+  for similaridadeEntreSentencas in listaDasSimilaridades:
     somaDasSimilaridades+=similaridadeEntreSentencas
     quantidadeDeSimilaridades+=1
   mediaSimilaridades=somaDasSimilaridades/quantidadeDeSimilaridades
   return mediaSimilaridades
 
-# def separarSentencasEtopicos(mediaSimilaridades, listares, stop_words):
-#   #separar as sentencas
-#   stop_words = set(stopwords.words('portuguese'))
-#   sentencasMaiusculas=nltk.tokenize.sent_tokenize(texto)
-#   listaPalavrasLimpas=[]
-#   for similaridadeEntreSentencas in range(len(listares)):
-#     if listares[similaridadeEntreSentencas]>=mediaSimilaridades:
-#       sentencasSimilaresUnidas="\n" + sentencasMaiusculas[similaridadeEntreSentencas]+"\n" + sentencasMaiusculas[similaridadeEntreSentencas+1] + "\n"
-#       print(sentencasSimilaresUnidas)
-#       sentencasSimilaresUnidas=word_tokenize(sentencasSimilaresUnidas.lower())
-#       for palavrasUnidas in sentencasSimilaresUnidas:
-#         if palavrasUnidas.isalnum() and palavrasUnidas not in stop_words:
-#           listaPalavrasLimpas.append(palavrasUnidas)
-#   frequencia=FreqDist(listaPalavrasLimpas)
-#   frequenciatopicos=frequencia.most_common(5)
 
-#   print(frequenciatopicos)
-
-
-def spacysentencas(listares):
-  listaspacy=[]
-  for i in range(len(listares)):
+def spacysentencas(listaDasSimilaridades):
+  listaEntidades=[]
+  for i in range(len(listaDasSimilaridades)):
     contador=0
-    if listares[i]!=0:
+    contadorUnidas=0
+    if listaDasSimilaridades[i]!=0:
       frase=nltk.tokenize.sent_tokenize(texto)
-      doc1=nlp(str(frase[i]))
-      doc2=nlp(str(frase[i+1]))
-      print("\ndoc1", doc1)
-      print("doc2", doc2)
-      listadoc1=[]
-      listadoc2=[]
+      sentenca1=nlp(str(frase[i+contadorUnidas]))
+      sentenca2=nlp(str(frase[i+1+contadorUnidas]))
+      # print("\nprimeira frase para buscar as entidades com spacy ", sentenca1)
+      # print("segunda frase para buscar as entidades com spacy ", sentenca2)
+      listaEntidades1=[]
+      listaEntidades2=[]
       listaPalavrasTopicos1=[]
-      # listaPalavrasTopicos2=[]
-      for k in doc1.ents:
-        print(f"a frase {doc1} tem palavras" , k, "|", k.label_)
-        listadoc1.append(k.label_)
-        listaPalavrasTopicos1.append(k)
-      for k in doc2.ents:
-        print(f"a frase {doc2} tem palavras" , k, "|", k.label_)
-        listadoc2.append(k.label_)
-        listaPalavrasTopicos1.append(k)
-      print("reconhecimento de entidades 1", listadoc1)
-      print("reconhecimento de entidades 2", listadoc2)
-      print(listaPalavrasTopicos1)
-      for i in listadoc1:
-        for j in listadoc2:
-          if i==j:
+      for entidadesDaSentenca1 in sentenca1.ents:
+        # print(f"a frase - {sentenca1} - tem entidade: " , entidadesDaSentenca1, "|", entidadesDaSentenca1.label_)
+        listaEntidades1.append(entidadesDaSentenca1.label_)
+        listaPalavrasTopicos1.append(entidadesDaSentenca1)
+      for entidadesDaSentenca2 in sentenca2.ents:
+        # print(f"a frase - {sentenca2} - tem entidade: " , entidadesDaSentenca2, "|", entidadesDaSentenca2.label_)
+        listaEntidades2.append(entidadesDaSentenca2.label_)
+        listaPalavrasTopicos1.append(entidadesDaSentenca2)
+      listaEntidades.append(listaPalavrasTopicos1)
+      # print("LISTA PALAVRAS TOPICOS 1", listaPalavrasTopicos1)
+      # print("reconhecimento de entidades frase 1", listaEntidades1)
+      # print("reconhecimento de entidades frase 2", listaEntidades2)
+      # print(listaPalavrasTopicos1)
+      for entidade1 in listaEntidades1:
+        for entidade2 in listaEntidades2:
+          if entidade1==entidade2:
             contador+=1
-      print("contador similaridades de entidades", contador)
-  #     if contador<1:
-  #       listaspacy.append("similares")
-  #   else:
-  #     listaspacy.append("similares")
-  # print("lista spacy", listaspacy)
-  return listaPalavrasTopicos1
+      # print("contador similaridades de entidades, ver quantas vezes tem o mesmo tipo de entidades em ambas as frases", contador)
+    contadorUnidas+=1
+    if listaDasSimilaridades[i]==0:
+        frase=nltk.tokenize.sent_tokenize(texto)
+        sentenca1=nlp(str(frase[i+contadorUnidas]))
+        # print("\nprimeira frase para buscar as entidades com spacy ", sentenca1)
+        listaEntidades1=[]
+        listaPalavrasTopicos1=[]
+        for entidadesDaSentenca1 in sentenca1.ents:
+          # print(f"a frase - {sentenca1} - tem entidade: " , entidadesDaSentenca1, "|", entidadesDaSentenca1.label_)
+          listaEntidades1.append(entidadesDaSentenca1.label_)
+          listaPalavrasTopicos1.append(entidadesDaSentenca1)
+        listaEntidades.append(listaPalavrasTopicos1)
+        # print("reconhecimento de entidades frase 1", listaEntidades1)
+        # print(listaPalavrasTopicos1)
+        # print("LISTA PALAVRAS TOPICOS 1", listaPalavrasTopicos1)
+  print(listaEntidades)
+  return listaEntidades
 
-def separarSentencasEtopicos(mediaSimilaridades, listares, listaPalavrasTopicos1):
+def separarSentencasEtopicos(mediaSimilaridades, listaDasSimilaridades, listaEntidades):
   #separar as sentencas
-  listaTopicos=[]
   stop_words = set(stopwords.words('portuguese'))
   sentencasMaiusculas=nltk.tokenize.sent_tokenize(texto)
   listaPalavrasLimpas=[]
-  for similaridadeEntreSentencas in range(len(listares)):
-    if listares[similaridadeEntreSentencas]>=mediaSimilaridades:
-      sentencasSimilaresUnidas="\n" + sentencasMaiusculas[similaridadeEntreSentencas]+"\n" + sentencasMaiusculas[similaridadeEntreSentencas+1] + "\n"
+  contadorUnicas=0
+  contadorUnidas=0
+  for i in range(len(listaDasSimilaridades)):
+    if listaDasSimilaridades[i]>=mediaSimilaridades:
+      listaTopicos=[]
+      contadorUnidas=0
+      sentencasSimilaresUnidas="\n" + sentencasMaiusculas[i]+"\n" + sentencasMaiusculas[i+1] + "\n"
       print("SENTENCAS COM SIMILARIDADE \n", sentencasSimilaresUnidas)
       sentencasSimilaresUnidas=word_tokenize(sentencasSimilaresUnidas.lower())
       for palavrasUnidas in sentencasSimilaresUnidas:
@@ -171,93 +163,80 @@ def separarSentencasEtopicos(mediaSimilaridades, listares, listaPalavrasTopicos1
           listaPalavrasLimpas.append(palavrasUnidas)
       frequencia=FreqDist(listaPalavrasLimpas)
       frequenciaTopicos=frequencia.most_common(5)
-  print(frequenciaTopicos)
-  for topico in frequenciaTopicos:
-    if topico[1]>=2:
-      listaTopicos.append(topico[0])
-  print("AQUI EEE", listaTopicos)
-  print(listaPalavrasTopicos1)
-  if len(listaTopicos)<5:
-    contador=0
-    while len(listaTopicos) < 5 and contador < len(listaPalavrasTopicos1):
-      listaTopicos.append(listaPalavrasTopicos1[contador])
-      contador+=1
-  if len(listaTopicos)<5:
-    # quantosTopicosFaltam=5-int(len(listaTopicos))
-    # while len(listaTopicos) < 5:
-    for i in range(len(frequenciaTopicos)):
-      if frequenciaTopicos[i][0] not in listaTopicos and len(listaTopicos)<5:
-        listaTopicos.append(frequenciaTopicos[i][0])
-  print("OS 5 TOPICOS \n", listaTopicos)
-
-# def separarSentencasEtopicos(mediaSimilaridades, listares, listaPalavrasTopicos1):
-#     # Separar as sentenças
-#     listaTopicos = []
-#     stop_words = set(stopwords.words('portuguese'))
-#     sentencasMaiusculas = nltk.tokenize.sent_tokenize(texto)
-#     listaPalavrasLimpas = []
-    
-#     for similaridadeEntreSentencas in range(len(listares)):
-#         if listares[similaridadeEntreSentencas] >= mediaSimilaridades:
-#             sentencasSimilaresUnidas = "\n" + sentencasMaiusculas[similaridadeEntreSentencas] + "\n" + sentencasMaiusculas[similaridadeEntreSentencas + 1] + "\n"
-#             print(sentencasSimilaresUnidas)
-#             sentencasSimilaresUnidas = word_tokenize(sentencasSimilaresUnidas.lower())
-            
-#             for palavrasUnidas in sentencasSimilaresUnidas:
-#                 if palavrasUnidas.isalnum() and palavrasUnidas not in stop_words:
-#                     listaPalavrasLimpas.append(palavrasUnidas)
-            
-#             # Frequência das palavras
-#             frequencia = FreqDist(listaPalavrasLimpas)
-#             frequenciaTopicos = frequencia.most_common(5)
-#             print(frequenciaTopicos)
-
-#             # Adicionando palavras que apareceram pelo menos 2 vezes
-#             for topico in frequenciaTopicos:
-#                 if topico[1] >= 2:
-#                     listaTopicos.append(topico[0])
-
-#     # Garantindo que teremos 5 tópicos (adicionando entidades se necessário)
-#     print("AQUI EEE", listaTopicos)
-#     print(listaPalavrasTopicos1)
-    
-#     if len(listaTopicos) < 5:
-#         contador = 0
-#         # Agora, verificamos se o contador não ultrapassa o tamanho da lista
-#         while len(listaTopicos) < 5 and contador < len(listaPalavrasTopicos1):
-#             listaTopicos.append(listaPalavrasTopicos1[contador])
-#             contador += 1
-#         print("Lista final de tópicos:", listaTopicos)
-
-#     return listaTopicos
-
-      
-
-
-
+      contadorUnidas+=1
+      # print("DREQUENCIA TOPICOS UNIDAS", frequenciaTopicos) ####
   # print(frequenciaTopicos)
-
+      for topico in frequenciaTopicos:
+        if topico[1]>=2:
+          listaTopicos.append(topico[0])
+    # print("palavra/palavras com mais de uma aparicao em ambas as frases que estao sendo comparadas", listaTopicos)
+    # print(listaPalavrasTopicos1)
+      if len(listaTopicos)<5:
+        contador=0
+        # print("AQUI OH", listaEntidades[contadorUnidas+contadorUnicas][contador]) ####
+        while len(listaTopicos) < 5 and contador < len(listaTopicos):
+          listaTopicos.append(listaEntidades[contadorUnidas+contadorUnicas][contador])
+          contador+=1
+        # print(listaTopicos) ####
+      if len(listaTopicos)<5:
+        for j in range(len(frequenciaTopicos)):
+          if frequenciaTopicos[j][0] not in listaTopicos and len(listaTopicos)<5:
+            listaTopicos.append(frequenciaTopicos[j][0])
+      print("OS 5 TOPICOS \n", listaTopicos, "\n")
+    ##################################
+    if listaDasSimilaridades[i]<mediaSimilaridades:
+      listaPalavrasLimpas=[]
+      listaTopicos=[]
+      sentencasSimilaridade=sentencasMaiusculas[i+contadorUnidas]
+      # print(contadorUnidas) ####
+      # print(sentencasSimilaridade) ####
+      print("SENTENCAS SEM SIMILARIDADE \n", sentencasSimilaridade, "\n")
+      # contadorUnicas+=1
+      sentencasSimilaridade=word_tokenize(sentencasSimilaridade.lower())
+      for palavrasUnidas in sentencasSimilaridade:
+        if palavrasUnidas.isalnum() and palavrasUnidas not in stop_words:
+          listaPalavrasLimpas.append(palavrasUnidas)
+      frequencia=FreqDist(listaPalavrasLimpas)
+      frequenciaTopicos=frequencia.most_common(5)
+      # print("FREQUENCIA TOPICOS UNICAS", frequenciaTopicos) ####
+      for topico in frequenciaTopicos:
+        if topico[1]>=2:
+          listaTopicos.append(topico[0])
+      # print("palavra/palavras com mais de uma aparicao em ambas as frases que estao sendo comparadas", listaTopicos)
+      # print(listaPalavrasTopicos1)
+      if len(listaTopicos)<5:
+        contador=0
+        # print("AQUI OH ", listaEntidades[contadorUnidas + contadorUnicas][contador]) ####
+        # print(contadorUnidas + contadorUnicas, contador) ####
+        # while len(listaTopicos)<5 and contador <= len(listaTopicos):  ####
+        # print("OUT OF RANGE", listaEntidades[contadorUnicas+contadorUnidas][contador]) ####
+        while len(listaTopicos) < 5 and contador < len(listaEntidades[contadorUnidas + contadorUnicas]):
+          listaTopicos.append(listaEntidades[contadorUnidas + contadorUnicas][contador])
+          contador += 1
+          # print(listaTopicos) ####
+          # print("LISTA TOPICOS UNICAS", listaTopicos) ####
+      if len(listaTopicos)<5:
+        for j in range(len(frequenciaTopicos)):
+          if frequenciaTopicos[j][0] not in listaTopicos and len(listaTopicos)<5:
+            listaTopicos.append(frequenciaTopicos[j][0])
+      contadorUnicas+=1
+      print("\nOS 5 TOPICOS \n", listaTopicos, "\n")
+      
 print()
 
-# texto='A ginasta Jade Barbosa, que obteve três medalhas nos Jogos Pan-Americanos do Rio, em julho, venceu votação na internet e será a representante brasileira no revezamento da tocha olímpica para Pequim-2008. A tocha passará por vinte países, mas o Brasil não estará no percurso olímpico. Por isso, Jade participará do evento em Buenos Aires, na Argentina, única cidade da América do Sul a receber o símbolo dos Jogos. O revezamento terminará em 8 de agosto, primeiro dia das Olimpíadas de Pequim.'
-texto='Os artistas brasileiros têm tido reconhecimento mundial. Dentre os artistas, destacam-se Anitta, Caetano Veloso e Gilberto Gil. Todos eles já ganharam notórias premiações.'
+texto='A ginasta Jade Barbosa, que obteve três medalhas nos Jogos Pan-Americanos do Rio, em julho, venceu votação na internet e será a representante brasileira no revezamento da tocha olímpica para Pequim-2008. A tocha passará por vinte países, mas o Brasil não estará no percurso olímpico. Por isso, Jade participará do evento em Buenos Aires, na Argentina, única cidade da América do Sul a receber o símbolo dos Jogos. O revezamento terminará em 8 de agosto, primeiro dia das Olimpíadas de Pequim.'
+# texto='Os artistas brasileiros têm tido reconhecimento mundial. Dentre os artistas, destacam-se Anitta, Caetano Veloso e Gilberto Gil. Todos eles já ganharam notórias premiações.'
 lista=listaTokenizada(texto)
 cosseno=formulaCosseno(lista)
 media=mediaSentencas(cosseno)
 spcy=spacysentencas(cosseno)
 separar=separarSentencasEtopicos(media, cosseno, spcy)
 print()
-print('Todos os resultados que foram gerados por meio da formula das somatorias (a primeira é similaridadde da s1 com s2, dps é da s2 com s3, etc...): ', cosseno, media)
-# pip install -U pip setuptools wheel
-# pip install -U spacy
-# !python -m spacy download pt_core_news_lg
-# from spacy import displacy
-
+print('Todos os resultados que foram gerados por meio da formula das somatorias. Depois é a média entre elas): ', cosseno, media)
 
 #falta:
 #botar os numeros ate 2 casas decimais
-#resolver os resultados que dao 0, pois tem sentencas que nao tem nenhuma palavra igual, entao a parte de cima da formula fica com 0, entao o resultado da 0 tb, parecendo que n tem semelhanca mesmo quando tem (na vdd acho que ate separa as sentencas do jeito que a paula deu no enunciado do projeto, mas n sei se ta certo ou é bug)
-#continuar o codigo, botando as palavras comuns e etc
+#continuar o codigo, separando sentencas e etc
 #ver se a separacao em def ta ok
 #perguntar se pode def sem return
 #ver as aspas para python mais antigos
