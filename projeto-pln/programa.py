@@ -8,8 +8,8 @@ from nltk.tokenize import word_tokenize
 from nltk import FreqDist
 from nltk.corpus import stopwords
 
-# |================================================================[ x ]====================================================================|
-                                                  # ESPAÇO PARA DOWNLOAD DE PACOTES E EXTRAS
+# |=================================================================================[ x ]==============================================================================================|
+                                                                  # ESPAÇO PARA DOWNLOAD DE PACOTES E EXTRAS
 # python -m spacy download pt_core_news_lg
 # python -m spacy download pt_core_news_sm
 
@@ -22,26 +22,30 @@ from nltk.corpus import stopwords
 # nltk.download('rslp') # Módulo para radicalizar
 # nltk.download('averaged_perceptron_tagger_eng')
 
-# |================================================================[ x ]====================================================================|
-                                                  # FUNÇÃO QUE FAZ A LEITURA DO ARQUIVO 
+# |=================================================================================[ x ]==============================================================================================|
+                                                                    # FUNÇÃO QUE FAZ A LEITURA DO ARQUIVO .TXT
 
 def leitura_arquivo(diretorio):
+  '''
+  A função irá ter como parâmetro o diretório do arquivo de entrada, depois ela faz a leitura do conteúdo do arquivo .txt
+  '''
+
   with open (diretorio, 'r', encoding='UTF-8') as arquivo:
     texto = arquivo.read()
 
-  return texto
+  return texto # --> retorna a variável "texto" com o contéudo salvo do arquivo
 
-# |================================================================[ x ]====================================================================|  
-                                            # FUNÇÃO QUE FAZ O PRE-PROCESSAMENTO DO ARQUIVO .TXT
-'''
-Essa função serve para processar um texto. Em poucas palavras, a função vai ter como entrada um texto qualquer e a saída será uma lista com
-todas sentenças desse texto e cada sentença terá uma lista com seus respectivos "tokens" (que são as palavras da sentença). Importante
-lembrar que o conteudo da lista sentença não haverá pontuações, artigos, preposições, ... Enfim, as listas de sentenças não terão stopwords 
-e os tokens (palavras) estarão em minusculo.
-'''
+# |=================================================================================[ x ]==============================================================================================|  
+                                                            # FUNÇÃO QUE FAZ O PRE-PROCESSAMENTO DO ARQUIVO .TXT
 
 def lista_tokenizada(texto):
-    
+    '''
+    Essa função serve para processar um texto. Em poucas palavras, a função vai ter como entrada um texto qualquer e a saída será uma lista com
+    todas sentenças desse texto e cada sentença terá uma lista com seus respectivos "tokens" (que são as palavras da sentença). Importante
+    lembrar que o conteudo da lista sentença não haverá pontuações, artigos, preposições, ... Enfim, as listas de sentenças não terão stopwords 
+    e os tokens (palavras) estarão em minusculo.
+    '''
+
     # DIVIDINDO O TEXO EM SENTENCAS 
     sentencas = nltk.tokenize.sent_tokenize(texto)
 
@@ -67,45 +71,40 @@ def lista_tokenizada(texto):
                 token_limpo.append(palavra)
         sentencas_limpas.append(token_limpo)
 
-    return sentencas_limpas # --> setenças sem as stopswords e em lowercase
+    return sentencas_limpas # --> retorna a lista de setenças sem as stopswords e em lowercase
 
-#resultado1 = pre_processamento(texto1)
-
-#resultado2 = pre_processamento(mariele_texto)
-
-#print(resultado2)
-
-# |================================================================[ x ]====================================================================|
-                                            # FUNÇÃO QUE CALCULA O POTENCIA E A SOMA DO DENOMINADOR
-'''
-Essa função servirá como auxiliadora. O objetivo dela é calcular o potencia e a soma de um vetor. Essa função será usada para facilitar o 
-cálculo do denonimador da fórmula do cosseno (que iremos ver em seguida).
-'''
+# |=================================================================================[ x ]==============================================================================================|
+                                                            # FUNÇÃO QUE CALCULA O POTENCIA E A SOMA DO DENOMINADOR
 
 def potencia_e_soma(vetor):
+  '''
+  Essa função servirá como auxiliadora. O objetivo dela é calcular o potencia e a soma de um vetor. Essa função será usada para facilitar o 
+  cálculo do denonimador da fórmula do cosseno (que iremos ver em seguida).
+  '''
 
   total = 0
 
-  for i in range (len(vetor)):
-    total += vetor[i] ** 2 # --> aqui ele irá calcular a potencia (2) do item do vetor[i] e somar com a variavel "total"
+  for indice in range (len(vetor)):
+    total += vetor[indice] ** 2 # --> aqui ele irá calcular a potencia (2) do item do vetor[i] e somar com a variavel "total"
 
-  return total # --> a soma total da poencia de cada item no vetor
+  return total # --> retorna a soma total da poencia de cada item no vetor
 
-# |================================================================[ x ]====================================================================|                        # FUNÇÃO QUE CALCULA A SIMILARIDADE ENTRE AS SENTENÇAS
-                                           # FUNÇÃO QUE CALCULA A SIMILARIDADE ENTRE DUAS SENTENÇAS
-'''
-Essa função é essencial para o funcionamento do projeto, pois calcula a similaridade entre sentenças consecutivas. Ela recebe uma lista de 
-sentenças já processadas (ou seja, tokenizadas, sem stopwords e normalizadas) e compara cada sentença com a próxima. 
-'''
+# |=================================================================================[ x ]==============================================================================================| 
+                                                            # FUNÇÃO QUE CALCULA A SIMILARIDADE ENTRE DUAS SENTENÇAS
 
 def similaridade (sentencas_limpas):
-  
+  '''
+  Essa função é essencial para o funcionamento do projeto, pois calcula a similaridade entre sentenças consecutivas. Ela recebe uma lista de 
+  sentenças já processadas (ou seja, tokenizadas, sem stopwords e normalizadas) e compara cada sentença com a próxima. 
+  '''
+
   # LISTA COM TODAS AS SIMILARIDADES 
   lista_das_similaridades = []
   
+  #------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------#
   # ALGORITMO QUE IRÁ FAZER O CALCULO DO COSSENO
- 
-  for indice in range(len(sentencas_limpas)-1): # 9
+  
+  for indice in range(len(sentencas_limpas)-1):
 
     # AQUI IRA CONCATENAR DUAS SENTENÇAS PARA POSTERIOR VERIFICAÇÃO DA FREQUENCIA 
     uniao_sentencas = list(set(sentencas_limpas[indice] + sentencas_limpas[indice+1]))
@@ -130,140 +129,185 @@ def similaridade (sentencas_limpas):
     for token in sentencas_limpas[indice + 1]:
       vetor2[uniao_sentencas.index(token)] += 1
 
-  #-----------------------------------------------------------------------------------------------------------------------------------------#
-    
-    # APLICANDO A FÓRMULA DO COSSENO
-    numerador = sum(vetor1[i] * vetor2[i] for i in range(len(uniao_sentencas)))
-    denominador = sqrt(potencia_e_soma(vetor1)) * sqrt(potencia_e_soma(vetor2))
+    #----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------#    # APLICANDO A FÓRMULA DO COSSENO
+    numerador = 0
+
+    for i in range(len(uniao_sentencas)):
+      numerador += vetor1[i] * vetor2[i] # --> aqui ele ira multiplicar o numero do vetor1 com outro numero do vetor2 nos mesmos indices e
+                                         #     somar com a variavel "numerador"
+
+    variavel_a = potencia_e_soma(vetor1) # --> calculando potencIa e soma para o denominador
+    variavel_b = potencia_e_soma(vetor2)
+
+    denominador = sqrt(variavel_a) * sqrt(variavel_b) # --> aqui vamos calcular o denominador 
                  
     # CALCULANDO A FORMULA FINAL
-    cosseno = numerador / denominador if denominador != 0 else 0
-  #-----------------------------------------------------------------------------------------------------------------------------------------#
+    cosseno = numerador / denominador if denominador != 0 else 0 # aqui garantimos que o denominador seja diferente de 0.
 
+    #----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------#
     # ADICIONANDO O RESULTADO DA SIMILARIDADE A LISTA
     lista_das_similaridades.append(cosseno)
 
-  return lista_das_similaridades
+  return lista_das_similaridades # --> retorna a lista de similaridades
 
-# |================================================================[ x ]====================================================================|
-                                              # FUNÇÃO QUE CALCULA A MÉDIA DAS SIMILARIDADES
-'''
-A função irá somar todas as similaridades e depois dividir pela quantidade de similaridades que tem na lista (média simples)
-'''
+# |=================================================================================[ x ]==============================================================================================|
+                                                                # FUNÇÃO QUE CALCULA A MÉDIA DAS SIMILARIDADES
+
 
 def media_similaridades(lista_das_similaridades):
-  # achar a média entre as similaridades
+    '''
+    A função irá somar todas as similaridades e depois dividir pela quantidade de similaridades que tem na lista (média simples)
+    '''
 
-  soma_similaridades = 0
-  quantidade_similaridades = len(lista_das_similaridades)
+    soma_similaridades = 0
+    quantidade_similaridades = len(lista_das_similaridades)
 
-  for similaridade_entre_sentencas in lista_das_similaridades:
-    soma_similaridades += similaridade_entre_sentencas
+    for similaridade_entre_sentencas in lista_das_similaridades:
+        soma_similaridades += similaridade_entre_sentencas
 
-  media_similaridades = (soma_similaridades / quantidade_similaridades)
+    media_similaridades = (soma_similaridades / quantidade_similaridades)
 
-  return media_similaridades
+    return media_similaridades # --> retorna a média das similaridades
 
-# |================================================================[ x ]====================================================================|
-                                  # FUNÇÃO QUE VAI CRIAR OS SUBTÓPICOS (SEGMENTAR O TEXTO EM SUBTÓPICOS)
-'''
-Essa função tem o papel de segmentar o texto em subtópicos com base na similaridade entre as sentenças.
-'''
+# |=================================================================================[ x ]==============================================================================================|
+                                                    # FUNÇÃO QUE VAI CRIAR OS SUBTÓPICOS (SEGMENTAR O TEXTO EM SUBTÓPICOS)
 
 def criar_subtopicos(texto, lista_similaridades, media_similaridade):
-    sentencas = nltk.tokenize.sent_tokenize(texto)
-    sub_topicos = []
-    sub_topico_atual = [sentencas[0]]
+    '''
+    Essa função tem o papel de segmentar o texto em subtópicos com base na similaridade entre as sentenças.
+    '''
 
-    media = round(media_similaridade * 1.2, 4)  # Ajustar o valor conforme necessário
+    # DIVIDE O TEXTO EM SENTENÇAS 
+    sentencas = nltk.tokenize.sent_tokenize(texto) # --> aqui vamos dividir o texto em sentenças
 
-    for i in range(len(lista_similaridades)):
-        if lista_similaridades[i] > media:
-            sub_topico_atual.append(sentencas[i + 1])
-        else:
-            # Verifica se o subtópico atual tem pelo menos 3 sentenças
+    # INICIALIZAR AS LISTAS PARA ARMAZENAR OS SUBTÓPICOS
+    sub_topicos = [] # --> aqui vamos guardar todos os subtópicos criados
+
+    sub_topico_atual = [sentencas[0]] # --> lista temporária que armazena as sentenças do subtopicos 
+
+    media = round(media_similaridade * 1.2, 4)  # --> podemos ajustar o valor conforme necessário para outros textos caso a media for muito baixa
+
+    #----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------#
+
+    # PERCORRE A LISTA DE SIMILARIDADES PARA CRIAR OS SUBTÓPICOS
+    for indice in range(len(lista_similaridades)): # --> nesse for vamos analisar cada similaridade
+        
+        if lista_similaridades[indice] > media: # --> se a similaridade for maior que a media, entao a sentença é pertence ao subtopico atual
+            sub_topico_atual.append(sentencas[indice + 1])
+
+        else: # se for menor, o subtópico atual está pronto e precisa ser finalizado
+            
+            '''
+            Aqui vamos verificar a quantidade de sentenças em "sub_topico_atual". O objetivo é evitar que um subtópico seja muito pequeno.
+            '''
+
             if len(sub_topico_atual) >= 3:
+                # se o subtópico atual tiver 3 ou mais sentenças, ele é adicionado à lista de subtópicos
                 sub_topicos.append(sub_topico_atual)
-            else:
-                # Se não tiver, mescla com o próximo subtópico
-                if sub_topicos:
-                    sub_topicos[-1].extend(sub_topico_atual)
-                else:
-                    sub_topicos.append(sub_topico_atual)
-            sub_topico_atual = [sentencas[i + 1]]
 
+            else: # se tiver menos de 3 sentenças, ele é mesclado com o último subtópico existente
+                
+                if sub_topicos: # --> verifica se a lista sub_topicos contem algum subtópico
+
+                    # se tiver, mescla com o último subtópico
+                    sub_topicos[-1].extend(sub_topico_atual) # --> aqui ele vai juntar o "sub_topico_atual" na ultima posição em "sub_topicos"
+
+                else:
+                    # se não houver subtópicos na lista, adiciona o "sub_topico_atual" como um novo sub_topicos
+                    sub_topicos.append(sub_topico_atual)
+
+            # inicia um novo subtópico com a próxima sentença
+            sub_topico_atual = [sentencas[indice + 1]]
+
+    #----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------#
+
+    '''
+    Após o loop, pode haver um subtópico atual que ainda não foi adicionado à lista. 
+    Essa parte a baixo faz a mesma verificação do passo anterior para garantir que ele seja processado.
+    '''
+
+    # FINALIZA O ULTIMO SUBTOPICO (CASO ELE AINDA NÃO TENHA SIDO ADICIONADO)
     if sub_topico_atual:
-        if len(sub_topico_atual) >= 3: # --> # Garante que o rótulo tenha pelo menos 3 palavras
+        if len(sub_topico_atual) >= 3: # --> # garante que o rótulo tenha pelo menos 3 palavras
+            # se o último subtópico tiver 3 ou mais sentenças, ele é adicionado a lista
             sub_topicos.append(sub_topico_atual)
+
         else:
+            # se tiver menos de 3 sentenças, ele é mesclado com o último subtópico existente
             if sub_topicos:
                 sub_topicos[-1].extend(sub_topico_atual)
             else:
+                # se não houver subtópicos na lista, adiciona o subtópico atual como um novo
                 sub_topicos.append(sub_topico_atual)
 
-    return sub_topicos
+    return sub_topicos # --> retorna a lista com os subtópicos
 
-# |================================================================[ x ]====================================================================|
-                                          # FUNÇÃO QUE VAI CRIAR OS RÓTULOS DE CADA SUBTÓPICOS
-'''
-A função irá criar rótulos de cada subtópicos com base nas palavras mais frequentes (onde também conterá os substantivos e verbos)
-'''
+# |=================================================================================[ x ]==============================================================================================|
+                                                            # FUNÇÃO QUE VAI CRIAR OS RÓTULOS DE CADA SUBTÓPICOS
 
 def criar_rotulos(lista_de_subtopicos):
-    # Lista para armazenar os rótulos
-    rotulos = []
+    '''
+    A função irá criar rótulos de cada subtópicos com base nas palavras mais frequentes (onde também conterá os substantivos e verbos)
+    '''
 
-    # Lista de palavras comuns que serão filtradas
-    palavras_comuns = ["tem", "depende", "também", "para", "que", "é", "um", "uma", "na", "da", "do", "de", "e", "com", "como", "mais", "mas", "se", "ou", "ajuda", "desempenha"]
+    rotulos = []  # --> lista para armazenar os rótulos
 
-    # Conjunto para armazenar palavras já usadas em rótulos anteriores
-    palavras_ja_usadas = set()
+    # LISTA DE PALAVRAS COMUNS QUE SERÃO FILTRADAS
+    palavras_comuns = ["tem", "depende", "também", "para", "que", "é", "um", "uma", "na", "da", "do", "de", "e", "com", "como", "mais", 
+                       "mas", "se", "ou", "ajuda", "desempenha"]
 
-    for subtopico in lista_de_subtopicos:
-        # Lista para armazenar substantivos, verbos, nomes próprios e adjetivos
-        palavras_validas = []
+    # CONJUNTO PARA ARMAZENAR PALAVRAS JÁ USADAS EM RÓTULOS ANTERIORES
+    palavras_ja_usadas = set() # --> evita que a mesma palavra seja usada como rótulo em mais de um subtópico.
 
-        # Percorre cada sentença do subtópico
+    #----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------#
+
+    # PERCORRE CADA SUBTÓPICO NA LISTA DE SUBTÓPICOS
+    for subtopico in lista_de_subtopicos: 
+        
+        palavras_validas = [] # --> lista para armazenar substantivos, verbos, nomes próprios e adjetivos
+
+        # PERCORRE CADA SENTENÇA DO SUBTÓPICO
         for sentenca in subtopico:
 
-            # Processa a sentença com spaCy
-            doc = nlp(sentenca)
+            doc = nlp(sentenca) # --> processa a sentença com spacy
+
+            # PERCORRE CADA PALAVRA (TOKEN) NA SENTENÇA PROCESSADA
             for token in doc:
 
-                # Verifica se a palavra é substantivo, verbo, nome próprio ou adjetivo
+                # VERIFICA SE A PALAVRA É SUBSTANTIVO, VERBO, NOME PRÓPRIO OU ADJETIVO
                 if token.pos_ in ["VERB", "ADJ", "PROPN", "NOUN"]:
-                    palavra = token.lemma_.lower()  # Usa a forma lematizada da palavra
+                    palavra = token.lemma_.lower()  # --> usar a forma lematizada da palavra (ex: "correndo" -> "correr")
                     if palavra not in palavras_comuns and palavra not in palavras_ja_usadas:
                         palavras_validas.append(palavra)
 
-        # Conta a frequência das palavras
+        # CONTA A FREQUÊNCIA DAS PALAVRAS
         contagem = FreqDist(palavras_validas)
 
-        # Seleciona as 5 palavras mais comuns
-        palavras_frequentes = [palavra for palavra, _ in contagem.most_common(5)]
+        # SELECIONA AS 5 PALAVRAS MAIS COMUNS
+        palavras_e_frequencias = contagem.most_common(5) # --> pegar as 5 palavras mais frequentes com suas frequências
 
-        # Adiciona as palavras ao conjunto de palavras já usadas
+       # CRIA UMA LISTA APENAS COM AS PALAVRAS (IGNORANDO AS FREQUÊNCIAS)
+        palavras_frequentes = []
+        for palavra, frequencia in palavras_e_frequencias:
+            palavras_frequentes.append(palavra)
+
+        # ADICIONA AS PALAVRAS AO CONJUNTO DE PALAVRAS JÁ USADAS
         palavras_ja_usadas.update(palavras_frequentes)
+        '''
+        O ".update" adiciona varios elementos de uma lista a um conjunto. Ele garante que apenas elementos unicos sejam adicionados.
+        '''
 
-        # Adiciona o rótulo à lista de rótulos
+        # ADICIONA O RÓTULO A LISTA DE RÓTULOS 
         rotulos.append(palavras_frequentes)
 
-    return rotulos  # Retorna a lista com os rótulos de cada subtópico
+    return rotulos  # --> retorna a lista com os rótulos de cada subtópico
 
-# |================================================================[ x ]====================================================================|
-                                            # FUNÇÃO QUE VAI JUNTAR AS SENTENÇAS DOS SUBTOPICOS
-
-def juntar_subtopicos(sub_topicos):
-    subtopicos_sentencas_unidas = []
-
-    for subtopico in sub_topicos:
-        juntar_sentencas = ' '.join(subtopico)
-        subtopicos_sentencas_unidas.append(juntar_sentencas)
-    
-    return subtopicos_sentencas_unidas
-
-# |================================================================[ x ]====================================================================|
-                                        # FUNÇÃO QUE TIRA AS ASPAS DOS ROTULOS DA LISTA DE ROTULOS
+# |=================================================================================[ x ]==============================================================================================|
+                                                            # FUNÇÃO QUE TIRA AS ASPAS DOS ROTULOS DA LISTA DE ROTULOS
+'''
+Como a lista de rotulos estao nesse formato: ex: ["alimentação", "saúde", "fundamental", "bem-estar", "bom"], a função irá remover as aspas 
+dos rótulos.
+'''
 
 def juntar_rotulos(rotulos):
     lista_rotulos_juntos = []
@@ -272,31 +316,31 @@ def juntar_rotulos(rotulos):
         rotulo_sem_aspas = ', '.join(rotulo)
         lista_rotulos_juntos.append(rotulo_sem_aspas)
     
-    return lista_rotulos_juntos
+    return lista_rotulos_juntos # --> retorna a lista de rótulos, mas agora sem aspas
 
-# |================================================================[ x ]====================================================================|
-                                                # FUNÇÃO QUE VAI CRIAR O ARQUIVO DE SAIDA
+# |=================================================================================[ x ]==============================================================================================|
+                                                                    # FUNÇÃO QUE VAI CRIAR O ARQUIVO DE SAIDA
 
 def saida_arquivo(diretorio, sub_topicos, lista_rotulos_juntos):
     with open(diretorio, 'w', encoding='UTF-8') as arquivo:
 
-        # Itera sobre cada subtópico e seu respectivo rótulo
+        # VAI PERCORRER CADA SUBTÓPICO E SEU RESPECTIVO RÓTULO E ESCREVE NO ARQUIVO .TXT
         for i in range(len(sub_topicos)):
             
-            # Escreve as sentenças do subtópico
+            # ESCREVE AS SENTENÇAS DO SUBTÓPICO
             for sentenca in sub_topicos[i]:
                 arquivo.write(f"{sentenca}\n")
             
-            # Escreve o rótulo do subtópico
+            # ESCREVE O RÓTULO DO SUBTÓPICO =
             arquivo.write(f"<tópico: {lista_rotulos_juntos[i]}>\n")
             
-            # Adiciona uma linha em branco para separar os subtópicos
+            # ADICIONA UMA LINHA EM BRANCO PARA SEPARAR OS SUBTÓPICOS 
             arquivo.write("\n")
         
-# |================================================================[ x ]====================================================================|
-                                                          # APLICANDO AS FUNÇÕES 
+# |=================================================================================[ x ]==============================================================================================|
+                                                                            # APLICANDO AS FUNÇÕES 
 
-texto = leitura_arquivo("/workspaces/Programacao_1/PROJETO_FINAL/projeto-pln/texto_entrada.txt")
+texto = leitura_arquivo("projeto-pln/texto_entrada.txt")
 resultado = lista_tokenizada(texto)
 
 
@@ -305,9 +349,10 @@ media_lista = media_similaridades(lista_similaridade)
 
 lista_subtopicos = criar_subtopicos(texto, lista_similaridade, media_lista)
 rotulos_gerados = criar_rotulos(lista_subtopicos)
+
 lista_rotulos_juntos = juntar_rotulos(rotulos_gerados)
 
-saida = saida_arquivo("/workspaces/Programacao_1/PROJETO_FINAL/projeto-pln/texto_saida.txt", lista_subtopicos, lista_rotulos_juntos)
+saida = saida_arquivo("projeto-pln/texto_saida.txt", lista_subtopicos, lista_rotulos_juntos)
 
 print("ARQUIVO GERADO.")
-# |================================================================[ x ]====================================================================|
+# |=================================================================================[ x ]==============================================================================================|
