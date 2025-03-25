@@ -17,10 +17,10 @@ from nltk.corpus import stopwords
 # pip install -U spacy
 # from spacy import displacy
 
-# nltk.download('punkt_tab') # Usado na tokenização
-# nltk.download('stopwords') # Módulo para stopwords
-# nltk.download('rslp') # Módulo para radicalizar
-# nltk.download('averaged_perceptron_tagger_eng')
+nltk.download('punkt_tab') # Usado na tokenização
+nltk.download('stopwords') # Módulo para stopwords
+nltk.download('rslp') # Módulo para radicalizar
+nltk.download('averaged_perceptron_tagger_eng')
 
 # |=================================================================================[ x ]==============================================================================================|
                                                                     # FUNÇÃO QUE FAZ A LEITURA DO ARQUIVO .TXT
